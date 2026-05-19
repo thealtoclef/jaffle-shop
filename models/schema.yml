@@ -7,6 +7,8 @@ models:
     columns:
       - name: customer_id
         description: This is a unique identifier for a customer
+        constraints:
+          - type: primary_key
         tests:
           - unique
           - not_null
@@ -26,7 +28,7 @@ models:
       - name: number_of_orders
         description: Count of the number of orders a customer has placed
 
-      - name: total_order_amount
+      - name: customer_lifetime_value
         description: Total value (AUD) of a customer's orders
 
   - name: orders
@@ -34,6 +36,8 @@ models:
 
     columns:
       - name: order_id
+        constraints:
+          - type: primary_key
         tests:
           - unique
           - not_null
@@ -80,3 +84,25 @@ models:
         description: Amount of the order (AUD) paid for by gift card
         tests:
           - not_null
+
+  - name: customer_details
+    description: One-to-one extension of customers with loyalty tier and points
+
+    columns:
+      - name: customer_id
+        description: FK to customers.customer_id — unique, so this is a one-to-one relation
+        tests:
+          - unique
+          - not_null
+          - relationships:
+              to: ref('customers')
+              field: customer_id
+
+      - name: tier
+        description: Loyalty tier of the customer
+        tests:
+          - accepted_values:
+              values: ['bronze', 'silver', 'gold']
+
+      - name: loyalty_points
+        description: Accumulated loyalty points

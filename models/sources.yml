@@ -1,0 +1,21 @@
+version: 2
+
+# Declares an existing seed-materialized table as a dbt source so that the
+# gateway's source-handling code path (sources → ModelInfo, meta.primary_keys,
+# catalog-comment description fallback) is exercised end-to-end against every
+# warehouse adapter. Intentionally uses a logical name that does not collide
+# with any model or seed.
+sources:
+  - name: jaffle_raw
+    schema: "{{ target.schema }}"
+    tables:
+      - name: source_customers
+        identifier: raw_customers
+        description: "Raw customer dump declared as a source for gateway tests"
+        meta:
+          primary_keys: [id]
+        columns:
+          - name: id
+            description: "Customer surrogate key"
+          - name: first_name
+          - name: last_name

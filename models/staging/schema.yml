@@ -4,6 +4,8 @@ models:
   - name: stg_customers
     columns:
       - name: customer_id
+        constraints:
+          - type: primary_key
         tests:
           - unique
           - not_null
@@ -11,6 +13,8 @@ models:
   - name: stg_orders
     columns:
       - name: order_id
+        constraints:
+          - type: primary_key
         tests:
           - unique
           - not_null
@@ -22,6 +26,8 @@ models:
   - name: stg_payments
     columns:
       - name: payment_id
+        constraints:
+          - type: primary_key
         tests:
           - unique
           - not_null
