@@ -1,0 +1,26 @@
+FROM ghcr.io/astral-sh/uv:python3.13-trixie-slim
+
+RUN uv tool install --with dbt-postgres "dbt-core~=1.10.0"
+
+WORKDIR /project
+COPY . /project/
+
+RUN mkdir -p /root/.dbt && \
+    cat <<'EOF' > /root/.dbt/profiles.yml
+jaffle_shop:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_HOST', 'postgres') }}"
+      port: "{{ env_var('DBT_PORT', '5432') | as_number }}"
+      user: "{{ env_var('DBT_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_DATABASE', 'postgres') }}"
+      schema: "{{ env_var('DBT_SCHEMA', 'public') }}"
+      threads: "{{ env_var('DBT_THREADS', '8') | as_number }}"
+EOF
+
+ENV DBT_PROFILES_DIR=/root/.dbt
+
+ENTRYPOINT ["sh", "-c", "dbt build --full-refresh && dbt docs generate && cp target/manifest.json target/catalog.json /target/"]
